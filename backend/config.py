@@ -6,6 +6,7 @@ from pathlib import Path
 
 # ── Paths ────────────────────────────────────────────────────────────────────
 # BASE_DIR points to the project root (one level above backend/)
+# 获取项目根目录（backend/ 的父目录）
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 MODEL_PATH = str(BASE_DIR / "outputs" / "checkpoints" / "efficientnet_transfer.keras")
@@ -35,6 +36,7 @@ ALLOWED_ORIGINS = ["*"]
 
 # ── Auth (mock) ───────────────────────────────────────────────────────────────
 # Replace with a real database / identity provider before going to production.
+# 模拟用户，用于开发环境
 MOCK_USERS: dict[str, str] = {
     "demo": "password123",
     "admin": "admin123",

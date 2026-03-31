@@ -1,5 +1,6 @@
 from fastapi import APIRouter
-from services.model_service import _model
+
+import services.model_service as model_service
 
 router = APIRouter()
 
@@ -9,5 +10,5 @@ def health_check():
     """Returns API status and whether the model has been loaded successfully."""
     return {
         "status": "ok",
-        "model_loaded": _model is not None,
+        "model_loaded": model_service._model is not None,
     }

@@ -53,11 +53,11 @@ def _find_backbone_and_last_conv(
 
 
 # ── Grad-CAM computation ──────────────────────────────────────────────────────
-
+#计算热力图
 def compute_gradcam(
-    image_batch: tf.Tensor,
-    pred_index: int | None = None,
-) -> tuple[np.ndarray, int]:
+    image_batch: tf.Tensor, #输入图像
+    pred_index: int | None = None, #预测类别索引
+) -> tuple[np.ndarray, int]: #返回热力图和预测类别索引
     """
     Compute a Grad-CAM heatmap for one image.
 
@@ -132,12 +132,12 @@ def compute_gradcam(
 
 
 # ── Overlay rendering ─────────────────────────────────────────────────────────
-
+#将热力图叠加到原始图像上
 def render_gradcam_overlay(
-    original_image: np.ndarray,
-    heatmap: np.ndarray,
-    alpha: float = 0.4,
-) -> tuple[np.ndarray, np.ndarray]:
+    original_image: np.ndarray, #原始图像
+    heatmap: np.ndarray, #热力图
+    alpha: float = 0.4, #叠加权重
+) -> tuple[np.ndarray, np.ndarray]: #返回叠加后的图像和原始图像
     """
     Resize the heatmap to the original image size and blend them together.
 

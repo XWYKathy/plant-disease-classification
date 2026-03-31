@@ -6,8 +6,8 @@ from services.auth_service import authenticate
 router = APIRouter()
 
 
-@router.post("/login", response_model=LoginResponse, summary="User login")
-def login(body: LoginRequest):
+@router.post("/login", response_model=LoginResponse, summary="User login") #FastAPI 会：自动校验返回格式 自动生成 Swagger 文档 自动过滤字段
+def login(body: LoginRequest): #FastAPI 自动解析请求体
     """
     Authenticate a user and return a bearer token.
 

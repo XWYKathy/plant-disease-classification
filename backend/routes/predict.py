@@ -49,9 +49,9 @@ async def predict(file: UploadFile = File(..., description="Plant leaf image (JP
 
     # ── 5. Return response ───────────────────────────────────────────────────
     return PredictResponse(
-        predicted_class=predicted_class,
-        confidence=round(confidence, 4),
-        top_k=[PredictionItem(**item) for item in top_k],
-        gradcam_heatmap=ndarray_to_base64_png(heatmap_rgb),
-        overlay_image=ndarray_to_base64_png(overlay),
+        predicted_class=predicted_class,#预测类别
+        confidence=round(confidence, 4),#置信度
+        top_k=[PredictionItem(**item) for item in top_k],#top_k结果
+        gradcam_heatmap=ndarray_to_base64_png(heatmap_rgb),#热力图
+        overlay_image=ndarray_to_base64_png(overlay),#叠加后的图像
     )
