@@ -15,6 +15,8 @@ from sqlalchemy import engine_from_config, pool
 # ── Make backend/ importable ──────────────────────────────────────────────────
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
+from dotenv import load_dotenv
+load_dotenv()
 from config import DATABASE_URL
 from db.base import Base
 import db.models  # noqa: F401 — registers all models with Base.metadata

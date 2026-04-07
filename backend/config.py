@@ -3,6 +3,8 @@ Central configuration for the Plant Disease Classification API.
 Edit the values here to adapt the backend to your environment.
 """
 import os
+from dotenv import load_dotenv
+load_dotenv()
 from pathlib import Path
 
 # ── Paths ────────────────────────────────────────────────────────────────────
