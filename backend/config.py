@@ -2,6 +2,7 @@
 Central configuration for the Plant Disease Classification API.
 Edit the values here to adapt the backend to your environment.
 """
+import os
 from pathlib import Path
 
 # ── Paths ────────────────────────────────────────────────────────────────────
@@ -34,10 +35,14 @@ CLASS_NAMES = [
 # Replace "*" with your frontend origin (e.g. "http://localhost:3000") in production
 ALLOWED_ORIGINS = ["*"]
 
-# ── Auth (mock) ───────────────────────────────────────────────────────────────
-# Replace with a real database / identity provider before going to production.
-# 模拟用户，用于开发环境
-MOCK_USERS: dict[str, str] = {
-    "demo": "password123",
-    "admin": "admin123",
-}
+# ── Database ──────────────────────────────────────────────────────────────────
+# Read from environment variable DATABASE_URL.
+# Example: postgresql://postgres:password@localhost:5432/plant_disease
+DATABASE_URL: str = os.environ["DATABASE_URL"]
+
+# ── JWT ───────────────────────────────────────────────────────────────────────
+# JWT_SECRET_KEY must be a long random string in production.
+# Generate one with:  python -c "import secrets; print(secrets.token_hex(32))"
+JWT_SECRET_KEY: str = os.environ["JWT_SECRET_KEY"]
+JWT_ALGORITHM: str = os.getenv("JWT_ALGORITHM", "HS256")
+JWT_EXPIRE_MINUTES: int = int(os.getenv("JWT_EXPIRE_MINUTES", "60"))

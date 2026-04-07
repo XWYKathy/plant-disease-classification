@@ -13,3 +13,12 @@ matplotlib>=3.8.0
 
 # Python multipart (required by FastAPI for file uploads)
 python-multipart>=0.0.9
+
+# Database
+sqlalchemy>=2.0.0
+psycopg2-binary>=2.9.9   # PostgreSQL driver
+alembic>=1.13.0          # DB migrations
+
+# Auth
+passlib[bcrypt]>=1.7.4   # password hashing
+python-jose[cryptography]>=3.3.0  # JWT

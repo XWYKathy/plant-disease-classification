@@ -14,23 +14,27 @@ import os
 sys.path.insert(0, os.path.dirname(__file__)) #backend/ 加到 sys.path，这样无论从哪个目录用 uvicorn 启动，内部的 config、routes 等包内导入都能正常解析。
 
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from config import ALLOWED_ORIGINS
-from routes import auth, health, predict
+from config import ALLOWED_ORIGINS, BASE_DIR
+from routes import auth, feedback, health, history, predict
 #启动时调用 load_model()，只加载一次模型；关停时预留了清理逻辑（例如释放 GPU
 from services.model_service import load_model
 
 
-# ── Lifespan: load model once at startup ─────────────────────────────────────
+# ── Lifespan: startup / shutdown hooks ───────────────────────────────────────
 #生命周期管理器，启动时调用 load_model()，只加载一次模型；关停时预留了清理逻辑（例如释放 GPU
 #yield 把函数分成两部分：yield 之前 → 初始化（startup） yield 之后 → 清理（shutdown）
 @asynccontextmanager #is used to define a lifecycle context in FastAPI, allowing initialization before the application starts and cleanup after it shuts down.
 async def lifespan(app: FastAPI):
+    # Ensure uploads directory exists
+    Path(BASE_DIR / "uploads").mkdir(parents=True, exist_ok=True)
+    # Load ML model once — shared across all requests
     load_model()
-    yield 
+    yield
     #后面的代码（你这里暂时没写）
     # Add any cleanup here if needed (e.g., release GPU memory)
 
@@ -43,7 +47,7 @@ app = FastAPI(
         "Upload a plant leaf image to get a disease prediction "
         "with a Grad-CAM visual explanation."
     ),
-    version="1.0.0",
+    version="2.0.0",
     lifespan=lifespan,
 )
 
@@ -58,6 +62,8 @@ app.add_middleware(
 )
 
 # ── Routes ───────────────────────────────────────────────────────────────────
-app.include_router(health.router,  tags=["Health"])
-app.include_router(auth.router,    tags=["Auth"])
-app.include_router(predict.router, tags=["Prediction"])
+app.include_router(health.router,   tags=["Health"])
+app.include_router(auth.router,     tags=["Auth"])
+app.include_router(predict.router,  tags=["Prediction"])
+app.include_router(history.router,  tags=["History"])
+app.include_router(feedback.router, tags=["Feedback"])

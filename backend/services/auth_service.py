@@ -1,37 +1,27 @@
 """
-Authentication service.
+Authentication service — DB-backed.
 
-Currently uses an in-memory mock store.  To add real auth:
-  - Replace `MOCK_USERS` in config.py with a DB lookup.
-  - Replace the opaque token with a signed JWT (e.g. python-jose).
-  - Replace `_active_tokens` with Redis or a DB session table.
+Public interface:
+    authenticate_user(db, username, password) -> str | None  (returns JWT on success)
 
-The public interface (authenticate / verify_token) stays the same.
+Users are created directly in the database (e.g. via psql or a seed script).
+To upgrade to OAuth2 / SSO later: replace only this file.
 """
-import secrets
-import sys
-import os
+from sqlalchemy.orm import Session
 
-# Allow running from the backend/ directory or from project root
-sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
-from config import MOCK_USERS
-
-# In-memory token store.  Not persistent across restarts.
-_active_tokens: dict[str, str] = {}   # token → username
+from services.user_service import get_user_by_username
+from utils.security import create_access_token, hash_password, verify_password
 
 
-def authenticate(username: str, password: str) -> str | None:
+def authenticate_user(db: Session, username: str, password: str) -> str | None:
     """
-    Validate credentials.  Returns an opaque bearer token on success, None on failure.
+    Validate credentials and return a signed JWT on success, None on failure.
+    Timing-safe: verify_password always runs even if the user doesn't exist,
+    preventing user enumeration via response time.
     """
-    expected_password = MOCK_USERS.get(username)
-    if expected_password is None or expected_password != password:
+    user = get_user_by_username(db, username)
+    # Use a dummy hash so verify_password always runs (constant-time guard)
+    candidate_hash = user.password_hash if user else hash_password("__dummy__")
+    if not verify_password(password, candidate_hash) or user is None:
         return None
-    token = secrets.token_hex(32)
-    _active_tokens[token] = username
-    return token
-
-
-def verify_token(token: str) -> str | None:
-    """Return the username for a valid token, or None if the token is unknown."""
-    return _active_tokens.get(token)
+    return create_access_token(username=user.username)

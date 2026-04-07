@@ -7,6 +7,7 @@ class PredictionItem(BaseModel):
 
 
 class PredictResponse(BaseModel):
+    record_id: int                  # DB primary key — use for feedback/history lookups
     predicted_class: str
     confidence: float
     top_k: list[PredictionItem]
