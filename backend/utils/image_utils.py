@@ -9,7 +9,7 @@ import numpy as np
 from PIL import Image
 
 # ── Allowed upload types ──────────────────────────────────────────────────────
-ALLOWED_CONTENT_TYPES = {"image/jpeg", "image/png", "image/webp", "image/bmp"}
+ALLOWED_CONTENT_TYPES = {"image/jpeg", "image/png", "image/webp", "image/bmp", "image/jpg"}
 
 
 def validate_image_content_type(content_type: str) -> None:
