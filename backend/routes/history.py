@@ -1,10 +1,13 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import FileResponse
+
 from sqlalchemy.orm import Session
 
+from config import BASE_DIR
 from db.models.user import User
 from db.session import get_db
 from schemas.history import PredictionHistoryItem
-from services.prediction_service import get_user_predictions
+from services.prediction_service import get_prediction_by_id, get_user_predictions
 from utils.dependencies import get_current_user
 
 router = APIRouter()
@@ -37,3 +40,20 @@ def get_history(
         )
         for r in records
     ]
+
+
+@router.get(
+    "/predictions/{record_id}/image",
+    summary="Download the original image for a prediction record",
+)
+def get_prediction_image(
+    record_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Returns the original uploaded image. Only the record owner can access it."""
+    record = get_prediction_by_id(db, record_id=record_id, user_id=current_user.id)
+    if record is None:
+        raise HTTPException(status_code=404, detail="Prediction record not found.")
+
+    return FileResponse(BASE_DIR / record.image_path)
